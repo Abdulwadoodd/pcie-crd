@@ -17,6 +17,9 @@ module crd #(
     wire oeq5, ogr5;
     wire [oWIDTH - 1:0] ones_count;
 
+    assign ones_count = dum;
+    assign oeq5 = ((ones_count) == (iWIDTH>>1));
+    assign ogr5 = ((ones_count) > (iWIDTH>>1));
 
     integer i;
     always @(posedge clk ) begin
@@ -30,10 +33,6 @@ module crd #(
             dum = dum + in_fetch[i];
         end
     end
-
-    assign ones_count = dum;
-    assign oeq5 = ((ones_count) == (iWIDTH>>1));
-    assign ogr5 = ((ones_count) > (iWIDTH>>1)); 
 
     /*      Melay state Machine        */
     parameter idle = 2'b00;
@@ -103,7 +102,6 @@ module crd #(
                         crd_bit=1;
                     end
         endcase    
-        
     end
 
 endmodule
