@@ -15,6 +15,7 @@ module crd #(
     reg [iWIDTH-1 : 0] in_fetch;
     reg [oWIDTH-1:0] dum;
     wire oeq5, ogr5;
+    reg beg;
     wire [oWIDTH - 1:0] ones_count;
 
     assign ones_count = dum;
@@ -23,8 +24,14 @@ module crd #(
 
     integer i;
     always @(posedge clk ) begin
-        if(!rst) in_fetch = data_in;
-        else in_fetch = 0; 
+        if(!rst) begin
+            in_fetch = data_in;
+            beg = 1'b1;
+        end
+        else begin
+            in_fetch = 0;
+            beg = 1'b0;
+        end
     end
     
     always @(*) begin
@@ -49,9 +56,14 @@ module crd #(
     end
     // Output & next state logic
     always @(*) begin 
-        case (cs)
+        casex (cs)
             idle: begin
-                    if(ogr5|oeq5)begin
+                    if(rst | beg==0) begin
+                        ns = idle;
+                        err = 1'bx;
+                        crd_bit = 1'bx;
+                    end
+                    else if(ogr5|oeq5)begin
                         ns = pos;
                         err = 0;
                         crd_bit = 1;
